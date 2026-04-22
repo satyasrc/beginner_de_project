@@ -12,6 +12,15 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgres://airflow:airflow@postgres:5432/airflow
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://webserver:8080/execution
+    AIRFLOW__CORE__SECRET_KEY: fef8bfc69e80411c6ee933a8ba1ab04551768a650e4122589a13b710a5ae6757
+    AIRFLOW__WEBSERVER__SECRET_KEY: fef8bfc69e80411c6ee933a8ba1ab04551768a650e4122589a13b710a5ae6757
+    AIRFLOW__API__SECRET_KEY: fef8bfc69e80411c6ee933a8ba1ab04551768a650e4122589a13b710a5ae6757
+    AIRFLOW__API__AUTH_JWT_SECRET: fef8bfc69e80411c6ee933a8ba1ab04551768a650e4122589a13b710a5ae6757
+    AIRFLOW_CONN_AWS_DEFAULT: '{"conn_type": "aws", "extra": {"aws_access_key_id": "minio", "aws_secret_access_key": "minio123", "region_name": "us-east-1", "endpoint_url": "http://minio:9000"}}'
+    AIRFLOW_CONN_SPARK_CONN: '{"conn_type": "spark", "host": "spark://192.168.0.1", "port": 7077}'
   volumes:
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
@@ -47,16 +56,14 @@ services:
   airflow-webserver:
     <<: *airflow-common
     container_name: webserver
-    command: webserver
+    command: api-server
     ports:
       - 8080:8080
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "--fail",
-          "http://localhost:8080/health"
+          "CMD-SHELL", # Change CMD to CMD-SHELL
+          "bash -c 'curl --fail http://localhost:8080/'" # Use bash -c to run curl
         ]
       interval: 10s
       timeout: 10s
@@ -71,7 +78,22 @@ services:
       test:
         [
           "CMD-SHELL",
-          'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"'
+          "bash -c 'airflow jobs check --job-type SchedulerJob --hostname \"$${HOSTNAME}\"'" # Use bash -c
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: dag-processor
+    command: dag-processor
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "bash -c 'airflow jobs check --job-type DagProcessorJob --hostname \"$${HOSTNAME}\"'"
         ]
       interval: 10s
       timeout: 10s
@@ -83,7 +105,7 @@ services:
     command: version
     environment:
       <<: *airflow-common-env
-      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
