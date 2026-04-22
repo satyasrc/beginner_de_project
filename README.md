@@ -1,24 +1,29 @@
 
 
 * [Beginner DE Project - Batch Edition](#beginner-de-project---batch-edition)
+    * [About Project](#about-project)
     * [Run Data Pipeline](#run-data-pipeline)
         * [Run on codespaces](#run-on-codespaces)
         * [Run locally](#run-locally)
     * [Architecture](#architecture)
 
-# Beginner DE Project - Batch Edition
+# About Project
 
-Code for blog at [Data Engineering Project for Beginners](https://www.startdataengineering.com/post/data-engineering-project-for-beginners-batch-edition/).
+Acknowledgment & History This project is a modified and evolved version of the original beginner_de_project created by Joseph Machado (startdataengineering). I have built upon the original foundation to include new bug fixes, improvements, and personal customizations.
+
+# Beginner DE Project - Batch Edition (UPDATED BY SITANSHU RAI)
+
+Code for blog at [Data Engineering Project for Beginners]().
 
 ## Run Data Pipeline
 
-Code available at **[beginner_de_project](https://github.com/josephmachado/beginner_de_project)** repository.
+Code available at **[beginner_de_project](https://github.com/satyasrc/beginner_de_project)** repository.
 
 ### Run on codespaces
 
 You can run this data pipeline using GitHub codespaces. Follow the instructions below.
 
-1. Create codespaces by going to the **[beginner_de_project](https://github.com/josephmachado/beginner_de_project)** repository, cloning it(or click `Use this template` button) and then clicking on `Create codespaces on main` button.
+1. Create codespaces by going to the **[beginner_de_project](https://github.com/satyasrc/beginner_de_project)** repository, cloning it(or click `Use this template` button) and then clicking on `Create codespaces on main` button.
 2. Wait for codespaces to start, then in the terminal type `make up`.
 3. Wait for `make up` to complete, and then wait for 30s (for Airflow to start).
 4. After 30s go to the `ports` tab and click on the link exposing port `8080` to access Airflow UI (username and password is `airflow`).
@@ -40,7 +45,7 @@ To run locally, you need:
 Clone the repo and run the following commands to start the data pipeline:
 
 ```bash
-git clone https://github.com/josephmachado/beginner_de_project.git
+git clone https://github.com/satyasrc/beginner_de_project
 cd beginner_de_project 
 make up
 sleep 30 # wait for Airflow to start
