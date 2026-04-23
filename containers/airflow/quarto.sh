@@ -1,11 +1,14 @@
 #!/bin/bash
 
-curl -L -o ~/quarto-1.5.43-linux-amd64.tar.gz https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.43/quarto-1.5.43-linux-amd64.tar.gz
-mkdir ~/opt
-tar -C ~/opt -xvzf ~/quarto-1.5.43-linux-amd64.tar.gz
+curl -L -o ~/quarto-1.5.43-linux-arm64.tar.gz https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.43/quarto-1.5.43-linux-arm64.tar.gz
+mkdir -p /opt
+tar -C /opt -xvzf ~/quarto-1.5.43-linux-arm64.tar.gz
 
-mkdir ~/.local/bin
-ln -s ~/opt/quarto-1.5.43/bin/quarto ~/.local/bin/quarto
+# Rename the extracted folder to a standard name if needed, or just link
+# The tarball extracts to 'quarto-1.5.43' usually.
+# Let's just link from there.
 
-( echo ""; echo 'export PATH=$PATH:~/.local/bin\n' ; echo "" ) >> ~/.profile
-source ~/.profile
+ln -s /opt/quarto-1.5.43/bin/quarto /usr/local/bin/quarto
+
+# Cleanup
+rm ~/quarto-1.5.43-linux-arm64.tar.gz

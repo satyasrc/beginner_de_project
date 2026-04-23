@@ -2,18 +2,22 @@
 # Setup containers to run Airflow
 
 docker-spin-up:
-	docker compose build && docker compose up airflow-init && docker compose up --build -d 
+	docker compose build --no-cache && docker compose up airflow-init && docker compose up --build -d
 
 perms:
 	sudo mkdir -p logs plugins temp dags tests data visualization && sudo chmod -R u=rwx,g=rwx,o=rwx logs plugins temp dags tests data visualization
 
+debug:
+	-docker exec -u airflow scheduler ls -la /home/airflow/.local/bin/airflow
+
 setup-conn:
-	docker exec scheduler python /opt/airflow/setup_conn.py
+	docker cp containers/airflow/setup_conn.py scheduler:/opt/airflow/setup_conn.py
+	docker exec -u airflow scheduler python /opt/airflow/setup_conn.py
 
 do-sleep:
 	sleep 30
 
-up: perms docker-spin-up do-sleep setup-conn
+up: perms docker-spin-up do-sleep
 
 down:
 	docker compose down

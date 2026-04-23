@@ -1,3 +1,4 @@
+"""Pipeline to analyze user behavior based on movie reviews and purchases."""
 import os
 import shutil
 import time
@@ -7,8 +8,11 @@ import boto3
 import duckdb
 
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
-from airflow.operators.python_operator import PythonOperator
+from airflow.providers.standard.operators.bash import BashOperator
+from airflow.providers.standard.operators.python import PythonOperator
+
+
+# Original problematic import line
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.providers.amazon.aws.transfers.local_to_s3 import (
     LocalFilesystemToS3Operator,
@@ -44,7 +48,7 @@ with DAG(
     "user_analytics_dag",
     description="A DAG to Pull user data and movie review data \
         to analyze their behaviour",
-    schedule_interval=timedelta(days=1),
+    schedule=timedelta(days=1),
     start_date=datetime(2023, 1, 1),
     catchup=False,
 ) as dag:
@@ -121,6 +125,7 @@ with DAG(
         group by 
           up.customer_id
         """
+        duckdb.sql("SET threads = 1")
         duckdb.sql(q).write_csv("/opt/airflow/data/behaviour_metrics.csv")
 
     get_user_behaviour_metric = PythonOperator(
